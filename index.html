@@ -44,7 +44,7 @@
         .shop-container { display: flex; flex-direction: column; gap: 10px; }
         .upgrade-btn, .action-btn { width: 100%; padding: 15px; border: 1px solid var(--border); border-radius: 15px; color: var(--text); background: var(--card); text-align: left; cursor: pointer; transition: 0.2s ease; }
         .upgrade-btn { display: flex; align-items: center; gap: 12px; }
-        .upgrade-btn:not(:disabled):active, .action-btn:active { transform: scale(0.98); }
+        .upgrade-btn:not(:disabled):active, .action-btn:active { transform:scale(0.98); }
         .upgrade-btn:disabled { opacity: 0.42; cursor: not-allowed; }
         .upgrade-icon { width: 42px; height: 42px; flex: 0 0 42px; display: grid; place-items: center; border-radius: 12px; background: rgba(255, 159, 10, 0.18); font-size: 21px; }
         .upgrade-info { flex: 1; }
@@ -106,7 +106,7 @@
                     <span class="upgrade-price" id="powerPrice">50 🪙</span>
                 </span>
             </button>
-            <!-- Бонус монет (новый) -->
+            <!-- Бонус монет -->
             <button class="upgrade-btn" id="buyBonus">
                 <span class="upgrade-icon">💰</span>
                 <span class="upgrade-info">
@@ -114,6 +114,36 @@
                     <span class="upgrade-description">Дает разовый множитель к награде за клик</span>
                     <span class="upgrade-level" id="bonusLevel">Уровень: 1</span>
                     <span class="upgrade-price" id="bonusPrice">200 🪙</span>
+                </span>
+            </button>
+            <!-- Критический удар -->
+            <button class="upgrade-btn" id="buyCrit">
+                <span class="upgrade-icon">🎯</span>
+                <span class="upgrade-info">
+                    <span class="upgrade-title">Критический удар</span>
+                    <span class="upgrade-description">Шанс нанести двойной урон при клике</span>
+                    <span class="upgrade-level" id="critLevel">Уровень: 0</span>
+                    <span class="upgrade-price" id="critPrice">500 🪙</span>
+                </span>
+            </button>
+            <!-- Супер-клик -->
+            <button class="upgrade-btn" id="buySuper">
+                <span class="upgrade-icon">✨</span>
+                <span class="upgrade-info">
+                    <span class="upgrade-title">Супер-клик</span>
+                    <span class="upgrade-description">Каждое 10-е нажатие x5 урона</span>
+                    <span class="upgrade-level" id="superLevel">Уровень: 0</span>
+                    <span class="upgrade-price" id="superPrice">1000 🪙</span>
+                </span>
+            </button>
+            <!-- Ловкость рук -->
+            <button class="upgrade-btn" id="buySpeed">
+                <span class="upgrade-icon">⚡</span>
+                <span class="upgrade-info">
+                    <span class="upgrade-title">Ловкость рук</span>
+                    <span class="upgrade-description">Позволяет нажимать кнопку чаще</span>
+                    <span class="upgrade-level" id="speedLevel">Уровень: 0</span>
+                    <span class="upgrade-price" id="speedPrice">750 🪙</span>
                 </span>
             </button>
             <!-- Автокликер -->
@@ -126,7 +156,7 @@
                     <span class="upgrade-price" id="autoPrice">100 🪙</span>
                 </span>
             </button>
-            <!-- Клик-ферма (новый) -->
+            <!-- Клик-ферма -->
             <button class="upgrade-btn" id="buyFarm">
                 <span class="upgrade-icon">🏭</span>
                 <span class="upgrade-info">
@@ -134,6 +164,16 @@
                     <span class="upgrade-description">Пассивный доход каждые 5 секунд</span>
                     <span class="upgrade-level" id="farmLevel">Уровень: 0</span>
                     <span class="upgrade-price" id="farmPrice">250 🪙</span>
+                </span>
+            </button>
+            <!-- Золотой идол -->
+            <button class="upgrade-btn" id="buyIdol">
+                <span class="upgrade-icon">🏛️</span>
+                <span class="upgrade-info">
+                    <span class="upgrade-title">Золотой идол</span>
+                    <span class="upgrade-description">Разово увеличивает текущий баланс</span>
+                    <span class="upgrade-level" id="idolLevel">Уровень: 0</span>
+                    <span class="upgrade-price" id="idolPrice">2000 🪙</span>
                 </span>
             </button>
         </div>
@@ -161,16 +201,26 @@
         coins: 0,
         power: 1,
         bonusMult: 1,
+        critChance: 0, // Шанс крита (0-1)
+        superClickCount: 0,
+        superClickThreshold: 10,
+        superClickMultiplier: 5,
+        clickCooldown: 100, 
+        
         autoClickEnabled: false,
         farmEnabled: false,
         
-        // Новые уровни для всех предметов
         levelPower: 1,
         levelBonus: 1,
+        levelCrit: 0,
+        levelSuper: 0,
+        levelSpeed: 0,
         levelAuto: 0,
         levelFarm: 0,
+        levelIdol: 0,
         
-        lastTickTime: Date.now()
+        lastTickTime: Date.now(),
+        lastClickTime: 0
     };
 
     let state = loadState();
@@ -185,18 +235,30 @@
     
     const buyPower = document.getElementById("buyPower");
     const buyBonus = document.getElementById("buyBonus");
+    const buyCrit = document.getElementById("buyCrit");
+    const buySuper = document.getElementById("buySuper");
+    const buySpeed = document.getElementById("buySpeed");
     const buyAuto = document.getElementById("buyAuto");
     const buyFarm = document.getElementById("buyFarm");
+    const buyIdol = document.getElementById("buyIdol");
     
     const powerPriceEl = document.getElementById("powerPrice");
     const bonusPriceEl = document.getElementById("bonusPrice");
+    const critPriceEl = document.getElementById("critPrice");
+    const superPriceEl = document.getElementById("superPrice");
+    const speedPriceEl = document.getElementById("speedPrice");
     const autoPriceEl = document.getElementById("autoPrice");
     const farmPriceEl = document.getElementById("farmPrice");
+    const idolPriceEl = document.getElementById("idolPrice");
     
     const powerLevelEl = document.getElementById("powerLevel");
     const bonusLevelEl = document.getElementById("bonusLevel");
+    const critLevelEl = document.getElementById("critLevel");
+    const superLevelEl = document.getElementById("superLevel");
+    const speedLevelEl = document.getElementById("speedLevel");
     const autoLevelEl = document.getElementById("autoLevel");
     const farmLevelEl = document.getElementById("farmLevel");
+    const idolLevelEl = document.getElementById("idolLevel");
 
     const saveBtn = document.getElementById("saveBtn");
     const resetBtn = document.getElementById("resetBtn");
@@ -211,21 +273,31 @@
             const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
             if (!saved) return { ...defaultState };
             
-            // Проверяем версию сохранения, чтобы старые сейвы не ломали игру
             if (saved.version !== "v2") return { ...defaultState };
 
             return {
                 ...defaultState,
-                coins: Math.max(0, Number(saved.coins) || 0),
-                power: Math.max(1, Number(saved.power) || 1),
-                bonusMult: Math.max(1, Number(saved.bonusMult) || 1),
+                coins: Math.max(0, Math.floor(Number(saved.coins)) || 0),
+                power: Math.max(1, Math.floor(Number(saved.power)) || 1),
+                bonusMult: Math.max(1, parseFloat((Number(saved.bonusMult) || 1).toFixed(2))),
+                critChance: Number(saved.critChance) || 0,
+                superClickCount: Number(saved.superClickCount) || 0,
+                clickCooldown: Math.max(50, Number(saved.clickCooldown) || 100),
+                
                 autoClickEnabled: saved.autoClickEnabled === true,
                 farmEnabled: saved.farmEnabled === true,
+                
                 levelPower: Math.max(1, Number(saved.levelPower) || 1),
                 levelBonus: Math.max(1, Number(saved.levelBonus) || 1),
+                levelCrit: Math.max(0, Number(saved.levelCrit) || 0),
+                levelSuper: Math.max(0, Number(saved.levelSuper) || 0),
+                levelSpeed: Math.max(0, Number(saved.levelSpeed) || 0),
                 levelAuto: Math.max(0, Number(saved.levelAuto) || 0),
                 levelFarm: Math.max(0, Number(saved.levelFarm) || 0),
-                lastTickTime: saved.lastTickTime || Date.now()
+                levelIdol: Math.max(0, Number(saved.levelIdol) || 0),
+                
+                lastTickTime: saved.lastTickTime || Date.now(),
+                lastClickTime: saved.lastClickTime || 0
             };
         } catch {
             return { ...defaultState };
@@ -240,12 +312,11 @@
     }
 
     function formatNumber(number) {
-        return new Intl.NumberFormat("ru-RU").format(number);
+        return new Intl.NumberFormat("ru-RU").format(Math.floor(number));
     }
 
     /* --- Расчеты цен --- */
     function getPrice(base, level) {
-        // Формула роста цены: base * (1.15 ^ level)
         return Math.floor(base * Math.pow(1.15, level));
     }
 
@@ -262,8 +333,12 @@
         /* Цены и уровни */
         const pricePower = getPrice(50, state.levelPower - 1);
         const priceBonus = getPrice(200, state.levelBonus - 1);
+        const priceCrit = getPrice(500, state.levelCrit);
+        const priceSuper = getPrice(1000, state.levelSuper);
+        const priceSpeed = getPrice(750, state.levelSpeed);
         const priceAuto = getPrice(100, state.levelAuto);
         const priceFarm = getPrice(250, state.levelFarm);
+        const priceIdol = getPrice(2000, state.levelIdol);
 
         powerPriceEl.textContent = `${pricePower} 🪙`;
         powerLevelEl.textContent = `Уровень: ${state.levelPower}`;
@@ -272,6 +347,20 @@
         bonusPriceEl.textContent = `${priceBonus} 🪙`;
         bonusLevelEl.textContent = `Уровень: ${state.levelBonus}`;
         buyBonus.disabled = state.coins < priceBonus;
+
+        critPriceEl.textContent = `${priceCrit} 🪙`;
+        critLevelEl.textContent = `Уровень: ${state.levelCrit} ( ${(state.levelCrit * 2).toFixed(1)}%)`;
+        buyCrit.disabled = state.coins < priceCrit;
+
+        superPriceEl.textContent = `${priceSuper} 🪙`;
+        superLevelEl.textContent = `Уровень: ${state.levelSuper}`;
+        buySuper.disabled = state.coins < priceSuper;
+
+        speedPriceEl.textContent = `${priceSpeed} 🪙`;
+        speedLevelEl.textContent = `Уровень: ${state.levelSpeed}`;
+        const currentCd = Math.max(50, 100 - state.levelSpeed * 10);
+        buySpeed.querySelector('.upgrade-description').textContent = `Перезарядка: ${currentCd}мс`;
+        buySpeed.disabled = state.coins < priceSpeed;
 
         if (state.autoClickEnabled) {
             buyAuto.classList.add("owned");
@@ -296,25 +385,29 @@
             farmPriceEl.textContent = `${priceFarm} 🪙`;
             farmLevelEl.textContent = `Уровень: ${state.levelFarm}`;
         }
+
+        idolPriceEl.textContent = `${priceIdol} 🪙`;
+        idolLevelEl.textContent = `Уровень: ${state.levelIdol}`;
+        buyIdol.disabled = state.coins < priceIdol;
     }
 
     /* --- Игровая логика --- */
     function addCoins(amount) {
         const finalAmount = amount * state.bonusMult;
-        state.coins += finalAmount;
+        state.coins += Math.floor(finalAmount);
         updateUI();
         saveState();
-        showFloatingCoins(finalAmount);
+        showFloatingCoins(Math.floor(finalAmount));
     }
 
     function showFloatingCoins(amount) {
         const element = document.createElement("span");
         element.className = "floating-coin";
-        element.textContent = `+${formatNumber(amount)}`; // Исправлено: добавлен $
+        element.textContent = `+${formatNumber(amount)}`;
         const areaRect = clickArea.getBoundingClientRect();
         const buttonRect = clickBtn.getBoundingClientRect();
-        element.style.left = `${buttonRect.left - areaRect.left + buttonRect.width / 2 - 15}px`; // Исправлено: добавлен $
-        element.style.top = `${buttonRect.top - areaRect.top + buttonRect.height / 2 - 10}px`; // Исправлено: добавлен $
+        element.style.left = `${buttonRect.left - areaRect.left + buttonRect.width / 2 - 15}px`;
+        element.style.top = `${buttonRect.top - areaRect.top + buttonRect.height / 2 - 10}px`;
         clickArea.appendChild(element);
         setTimeout(() => element.remove(), 800);
     }
@@ -328,15 +421,12 @@
 
         if (state.autoClickEnabled) {
             const coinsToAdd = state.power * secondsPassed;
-            state.coins += coinsToAdd;
+            state.coins += Math.floor(coinsToAdd);
         }
 
         if (state.farmEnabled) {
-            // Ферма срабатывает строго каждые 5 секунд накопленного времени
-            // Это позволяет корректно работать фону приложения
-            // Для простоты реализации здесь начисляем пропорционально времени
             const farmCoins = state.levelFarm * 5 * secondsPassed;
-            state.coins += farmCoins;
+            state.coins += Math.floor(farmCoins);
         }
 
         updateUI();
@@ -363,7 +453,25 @@
 
     /* --- Обработчики событий --- */
     clickBtn.addEventListener("click", () => {
-        addCoins(state.power);
+        const now = Date.now();
+        if (now - state.lastClickTime < state.clickCooldown) return;
+        state.lastClickTime = now;
+
+        let baseGain = state.power;
+
+        // Супер-клик
+        state.superClickCount++;
+        if (state.superClickCount >= state.superClickThreshold) {
+            baseGain *= state.superClickMultiplier;
+            state.superClickCount = 0;
+        }
+
+        // Критический удар
+        if (state.levelCrit > 0 && Math.random() < state.levelCrit * 0.02) {
+            baseGain *= 2;
+        }
+
+        addCoins(baseGain);
     });
 
     buyPower.addEventListener("click", () => {
@@ -381,7 +489,36 @@
         if (state.coins < price) return;
         state.coins -= price;
         state.levelBonus++;
-        state.bonusMult += 0.2; // Каждый уровень дает +20% к монете (+0.2x)
+        state.bonusMult = parseFloat((state.bonusMult + 0.2).toFixed(2));
+        updateUI();
+        saveState();
+    });
+
+    buyCrit.addEventListener("click", () => {
+        const price = getPrice(500, state.levelCrit);
+        if (state.coins < price) return;
+        state.coins -= price;
+        state.levelCrit++;
+        updateUI();
+        saveState();
+    });
+
+    buySuper.addEventListener("click", () => {
+        const price = getPrice(1000, state.levelSuper);
+        if (state.coins < price) return;
+        state.coins -= price;
+        state.levelSuper++;
+        state.superClickThreshold = Math.max(5, 10 - Math.floor(state.levelSuper / 2)); // Чем выше уровень, тем чаще срабатывает
+        updateUI();
+        saveState();
+    });
+
+    buySpeed.addEventListener("click", () => {
+        const price = getPrice(750, state.levelSpeed);
+        if (state.coins < price) return;
+        state.coins -= price;
+        state.levelSpeed++;
+        state.clickCooldown = Math.max(50, 100 - state.levelSpeed * 10);
         updateUI();
         saveState();
     });
@@ -406,6 +543,19 @@
         startIncomeLoop();
         updateUI();
         saveState();
+    });
+
+    buyIdol.addEventListener("click", () => {
+        const price = getPrice(2000, state.levelIdol);
+        if (state.coins < price) return;
+        state.coins -= price;
+        state.levelIdol++;
+        // Начисляем процент от текущего баланса
+        const bonus = Math.floor(state.coins * (0.1 + state.levelIdol * 0.05));
+        state.coins += bonus;
+        updateUI();
+        saveState();
+        showFloatingCoins(bonus);
     });
 
     tabGame.addEventListener("click", () => switchView(true));
