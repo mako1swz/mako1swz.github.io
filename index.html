@@ -15,7 +15,6 @@
       --border: rgba(255,255,255,0.08);
       --accent: #ff9f0a;
       --success: #4caf50;
-      --danger: #ff5252;
       --muted: #9ca3af;
     }
 
@@ -63,9 +62,9 @@
       margin-top: -6px;
     }
 
+    .tabs,
     .stats-panel,
-    .shop-container,
-    .tabs {
+    .shop-container {
       width: 100%;
       background: rgba(255,255,255,0.03);
       backdrop-filter: blur(10px);
@@ -97,7 +96,6 @@
 
     .panel {
       display: none;
-      width: 100%;
     }
 
     .panel.active {
@@ -145,8 +143,6 @@
       box-shadow: 0 16px 40px rgba(0, 0, 0, 0.42);
       user-select: none;
       transition: transform 0.08s ease, box-shadow 0.2s ease, filter 0.2s ease;
-      position: relative;
-      overflow: hidden;
       align-self: center;
       margin-top: 8px;
     }
@@ -154,16 +150,6 @@
     #clickBtn:active {
       transform: scale(0.94);
       filter: brightness(1.05);
-    }
-
-    #clickBtn.autopulse {
-      animation: pulse 1.6s infinite;
-    }
-
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.45), 0 16px 40px rgba(0,0,0,0.42); }
-      70% { box-shadow: 0 0 0 18px rgba(76, 175, 80, 0), 0 16px 40px rgba(0,0,0,0.42); }
-      100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0), 0 16px 40px rgba(0,0,0,0.42); }
     }
 
     .shop-container {
@@ -220,6 +206,12 @@
       font-weight: 800;
       font-size: 15px;
       color: var(--accent);
+    }
+
+    .upgrade-level {
+      font-size: 12px;
+      color: #fff;
+      opacity: 0.8;
     }
 
     .progress-bar {
@@ -307,11 +299,12 @@
 
         <div class="upgrade-row">
           <div class="upgrade-info">
-            <span class="upgrade-name">Сила клика +1</span>
-            <span class="upgrade-desc">Увеличивает доход за клик</span>
+            <span class="upgrade-name">Сила клика</span>
+            <span class="upgrade-desc">Увеличивает доход за каждый клик</span>
           </div>
           <div class="upgrade-actions">
-            <span class="upgrade-price" id="pricePower">25</span>
+            <span class="upgrade-level" id="levelPower">Ур. 1</span>
+            <span class="upgrade-price" id="pricePower">10</span>
             <div class="progress-bar"><div class="progress-fill" id="progPower"></div></div>
             <button class="buy-btn" id="btnBuyPower">Купить</button>
           </div>
@@ -320,10 +313,11 @@
         <div class="upgrade-row">
           <div class="upgrade-info">
             <span class="upgrade-name">Автокликер</span>
-            <span class="upgrade-desc">+1 монета в секунду</span>
+            <span class="upgrade-desc">Добавляет 1 монету в секунду</span>
           </div>
           <div class="upgrade-actions">
-            <span class="upgrade-price" id="priceAuto">50</span>
+            <span class="upgrade-level" id="levelAuto">Ур. 0</span>
+            <span class="upgrade-price" id="priceAuto">25</span>
             <div class="progress-bar"><div class="progress-fill" id="progAuto"></div></div>
             <button class="buy-btn" id="btnBuyAuto">Купить</button>
           </div>
@@ -332,10 +326,11 @@
         <div class="upgrade-row">
           <div class="upgrade-info">
             <span class="upgrade-name">Усиление автоклика</span>
-            <span class="upgrade-desc">Удваивает доход от автоклика</span>
+            <span class="upgrade-desc">Удваивает доход автоклика за уровень</span>
           </div>
           <div class="upgrade-actions">
-            <span class="upgrade-price" id="priceAutoBoost">120</span>
+            <span class="upgrade-level" id="levelAutoBoost">Ур. 0</span>
+            <span class="upgrade-price" id="priceAutoBoost">40</span>
             <div class="progress-bar"><div class="progress-fill" id="progAutoBoost"></div></div>
             <button class="buy-btn" id="btnBuyAutoBoost">Купить</button>
           </div>
@@ -344,10 +339,11 @@
         <div class="upgrade-row">
           <div class="upgrade-info">
             <span class="upgrade-name">Крит-клик</span>
-            <span class="upgrade-desc">Иногда даёт x2 за клик</span>
+            <span class="upgrade-desc">Увеличивает шанс двойного клика</span>
           </div>
           <div class="upgrade-actions">
-            <span class="upgrade-price" id="priceCrit">80</span>
+            <span class="upgrade-level" id="levelCrit">Ур. 0</span>
+            <span class="upgrade-price" id="priceCrit">35</span>
             <div class="progress-bar"><div class="progress-fill" id="progCrit"></div></div>
             <button class="buy-btn" id="btnBuyCrit">Купить</button>
           </div>
@@ -356,10 +352,11 @@
         <div class="upgrade-row">
           <div class="upgrade-info">
             <span class="upgrade-name">Скидка на магазин</span>
-            <span class="upgrade-desc">Снижает цены всех будущих покупок</span>
+            <span class="upgrade-desc">Снижает цену всех улучшений</span>
           </div>
           <div class="upgrade-actions">
-            <span class="upgrade-price" id="priceDiscount">150</span>
+            <span class="upgrade-level" id="levelDiscount">Ур. 0</span>
+            <span class="upgrade-price" id="priceDiscount">60</span>
             <div class="progress-bar"><div class="progress-fill" id="progDiscount"></div></div>
             <button class="buy-btn" id="btnBuyDiscount">Купить</button>
           </div>
@@ -385,11 +382,11 @@
     };
 
     let coins = Number(localStorage.getItem(LS.coins) || 0);
-    let power = Number(localStorage.getItem(LS.power) || 1);
-    let autoEnabled = localStorage.getItem(LS.auto) === 'true';
-    let autoBoost = localStorage.getItem(LS.autoBoost) === 'true';
-    let critEnabled = localStorage.getItem(LS.crit) === 'true';
-    let discountEnabled = localStorage.getItem(LS.discount) === 'true';
+    let powerLevel = Number(localStorage.getItem(LS.power) || 1);
+    let autoLevel = Number(localStorage.getItem(LS.auto) || 0);
+    let autoBoostLevel = Number(localStorage.getItem(LS.autoBoost) || 0);
+    let critLevel = Number(localStorage.getItem(LS.crit) || 0);
+    let discountLevel = Number(localStorage.getItem(LS.discount) || 0);
 
     let autoInterval = null;
 
@@ -415,6 +412,12 @@
     const priceCritEl = document.getElementById('priceCrit');
     const priceDiscountEl = document.getElementById('priceDiscount');
 
+    const levelPowerEl = document.getElementById('levelPower');
+    const levelAutoEl = document.getElementById('levelAuto');
+    const levelAutoBoostEl = document.getElementById('levelAutoBoost');
+    const levelCritEl = document.getElementById('levelCrit');
+    const levelDiscountEl = document.getElementById('levelDiscount');
+
     const progPowerEl = document.getElementById('progPower');
     const progAutoEl = document.getElementById('progAuto');
     const progAutoBoostEl = document.getElementById('progAutoBoost');
@@ -422,46 +425,58 @@
     const progDiscountEl = document.getElementById('progDiscount');
 
     function discountMul() {
-      return discountEnabled ? 0.85 : 1;
+      return 1 - Math.min(0.35, discountLevel * 0.05);
     }
 
     function getPowerCost() {
-      return Math.floor(25 * Math.pow(1.25, power - 1) * discountMul());
+      return Math.floor(10 * Math.pow(1.22, powerLevel - 1) * discountMul());
     }
 
     function getAutoCost() {
-      return Math.floor(50 * discountMul());
+      return Math.floor(25 * Math.pow(1.35, autoLevel) * discountMul());
     }
 
     function getAutoBoostCost() {
-      return Math.floor(120 * discountMul());
+      return Math.floor(40 * Math.pow(1.45, autoBoostLevel) * discountMul());
     }
 
     function getCritCost() {
-      return Math.floor(80 * discountMul());
+      return Math.floor(35 * Math.pow(1.4, critLevel) * discountMul());
     }
 
     function getDiscountCost() {
-      return Math.floor(150 * discountMul());
+      return Math.floor(60 * Math.pow(1.5, discountLevel));
+    }
+
+    function getClickPower() {
+      return powerLevel;
     }
 
     function getAutoPerSec() {
-      let income = autoEnabled ? 1 : 0;
-      if (autoBoost && autoEnabled) income *= 2;
-      return income;
+      if (autoLevel === 0) return 0;
+      return autoLevel * Math.max(1, autoBoostLevel + 1);
+    }
+
+    function getCritChance() {
+      return Math.min(0.5, critLevel * 0.05);
     }
 
     function save() {
       localStorage.setItem(LS.coins, String(coins));
-      localStorage.setItem(LS.power, String(power));
-      localStorage.setItem(LS.auto, String(autoEnabled));
-      localStorage.setItem(LS.autoBoost, String(autoBoost));
-      localStorage.setItem(LS.crit, String(critEnabled));
-      localStorage.setItem(LS.discount, String(discountEnabled));
+      localStorage.setItem(LS.power, String(powerLevel));
+      localStorage.setItem(LS.auto, String(autoLevel));
+      localStorage.setItem(LS.autoBoost, String(autoBoostLevel));
+      localStorage.setItem(LS.crit, String(critLevel));
+      localStorage.setItem(LS.discount, String(discountLevel));
 
       if (tg?.sendData) {
         tg.sendData(JSON.stringify({
-          coins, power, autoEnabled, autoBoost, critEnabled, discountEnabled
+          coins,
+          powerLevel,
+          autoLevel,
+          autoBoostLevel,
+          critLevel,
+          discountLevel
         }));
       }
     }
@@ -469,7 +484,7 @@
     function updateUI() {
       scoreEl.textContent = coins;
       coinsEl.textContent = coins;
-      statPowerEl.textContent = power;
+      statPowerEl.textContent = getClickPower();
       statPerSecEl.textContent = getAutoPerSec();
 
       const costPower = getPowerCost();
@@ -484,6 +499,12 @@
       priceCritEl.textContent = costCrit;
       priceDiscountEl.textContent = costDiscount;
 
+      levelPowerEl.textContent = `Ур. ${powerLevel}`;
+      levelAutoEl.textContent = `Ур. ${autoLevel}`;
+      levelAutoBoostEl.textContent = `Ур. ${autoBoostLevel}`;
+      levelCritEl.textContent = `Ур. ${critLevel}`;
+      levelDiscountEl.textContent = `Ур. ${discountLevel}`;
+
       progPowerEl.style.width = Math.min(100, (coins / costPower) * 100) + '%';
       progAutoEl.style.width = Math.min(100, (coins / costAuto) * 100) + '%';
       progAutoBoostEl.style.width = Math.min(100, (coins / costAutoBoost) * 100) + '%';
@@ -491,17 +512,12 @@
       progDiscountEl.style.width = Math.min(100, (coins / costDiscount) * 100) + '%';
 
       btnBuyPower.disabled = coins < costPower;
-      btnBuyAuto.disabled = coins < costAuto || autoEnabled;
-      btnBuyAutoBoost.disabled = coins < costAutoBoost || autoBoost || !autoEnabled;
-      btnBuyCrit.disabled = coins < costCrit || critEnabled;
-      btnBuyDiscount.disabled = coins < costDiscount || discountEnabled;
+      btnBuyAuto.disabled = coins < costAuto;
+      btnBuyAutoBoost.disabled = coins < costAutoBoost || autoLevel === 0;
+      btnBuyCrit.disabled = coins < costCrit;
+      btnBuyDiscount.disabled = coins < costDiscount;
 
-      btnBuyAuto.textContent = autoEnabled ? 'ВКЛ' : 'Купить';
-      btnBuyAutoBoost.textContent = autoBoost ? 'ВКЛ' : 'Купить';
-      btnBuyCrit.textContent = critEnabled ? 'ВКЛ' : 'Купить';
-      btnBuyDiscount.textContent = discountEnabled ? 'ВКЛ' : 'Купить';
-
-      clickBtn.classList.toggle('autopulse', autoEnabled);
+      clickBtn.textContent = `КЛИК +${getClickPower()}`;
     }
 
     function createFloatNumber(amount, x, y) {
@@ -517,12 +533,12 @@
     function startAutoClick() {
       clearInterval(autoInterval);
       autoInterval = setInterval(() => {
-        if (!autoEnabled) return;
-        let gain = 1;
-        if (autoBoost) gain *= 2;
-        coins += gain;
-        save();
-        updateUI();
+        const gain = getAutoPerSec();
+        if (gain > 0) {
+          coins += gain;
+          save();
+          updateUI();
+        }
       }, 1000);
     }
 
@@ -538,8 +554,8 @@
     });
 
     clickBtn.addEventListener('click', (e) => {
-      let gain = power;
-      if (critEnabled && Math.random() < 0.15) {
+      let gain = getClickPower();
+      if (critLevel > 0 && Math.random() < getCritChance()) {
         gain *= 2;
       }
       coins += gain;
@@ -552,7 +568,7 @@
       const cost = getPowerCost();
       if (coins >= cost) {
         coins -= cost;
-        power += 1;
+        powerLevel += 1;
         save();
         updateUI();
       }
@@ -560,9 +576,9 @@
 
     btnBuyAuto.addEventListener('click', () => {
       const cost = getAutoCost();
-      if (!autoEnabled && coins >= cost) {
+      if (coins >= cost) {
         coins -= cost;
-        autoEnabled = true;
+        autoLevel += 1;
         startAutoClick();
         save();
         updateUI();
@@ -571,9 +587,10 @@
 
     btnBuyAutoBoost.addEventListener('click', () => {
       const cost = getAutoBoostCost();
-      if (autoEnabled && !autoBoost && coins >= cost) {
+      if (coins >= cost && autoLevel > 0) {
         coins -= cost;
-        autoBoost = true;
+        autoBoostLevel += 1;
+        startAutoClick();
         save();
         updateUI();
       }
@@ -581,9 +598,9 @@
 
     btnBuyCrit.addEventListener('click', () => {
       const cost = getCritCost();
-      if (!critEnabled && coins >= cost) {
+      if (coins >= cost) {
         coins -= cost;
-        critEnabled = true;
+        critLevel += 1;
         save();
         updateUI();
       }
@@ -591,15 +608,15 @@
 
     btnBuyDiscount.addEventListener('click', () => {
       const cost = getDiscountCost();
-      if (!discountEnabled && coins >= cost) {
+      if (coins >= cost) {
         coins -= cost;
-        discountEnabled = true;
+        discountLevel += 1;
         save();
         updateUI();
       }
     });
 
-    if (autoEnabled) startAutoClick();
+    startAutoClick();
     updateUI();
   </script>
 </body>
