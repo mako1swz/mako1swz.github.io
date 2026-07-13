@@ -12,11 +12,10 @@
       --btn: var(--tg-theme-button-color, #ff9f0a);
       --btn-text: var(--tg-theme-button-text-color, #000000);
       --secondary: var(--tg-theme-secondary-bg-color, #1c1f26);
-      --border: rgba(255,255,255,0.08);
+      --border: var(--tg-theme-hint-color, #2f3440);
       --accent: #ff9f0a;
       --success: #4caf50;
       --danger: #ff5252;
-      --muted: #9ca3af;
     }
 
     * {
@@ -33,18 +32,20 @@
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      align-items: center;
       padding: 16px;
       overflow-x: hidden;
     }
 
     .wrapper {
       width: 100%;
-      max-width: 430px;
+      max-width: 420px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      padding-bottom: 18px;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 24px;
     }
 
     #score {
@@ -52,7 +53,7 @@
       font-weight: 800;
       line-height: 1;
       text-align: center;
-      margin-top: 8px;
+      margin-top: 12px;
       text-shadow: 0 0 24px rgba(255,159,10,0.18);
     }
 
@@ -60,55 +61,24 @@
       color: #a9a9b2;
       font-size: 14px;
       text-align: center;
-      margin-top: -6px;
+      margin-top: -8px;
     }
 
     .stats-panel,
-    .shop-container,
-    .tabs {
+    .shop-container {
       width: 100%;
       background: rgba(255,255,255,0.03);
       backdrop-filter: blur(10px);
-      border-radius: 18px;
-      border: 1px solid var(--border);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
       box-shadow: 0 10px 30px rgba(0,0,0,0.22);
     }
 
-    .tabs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      overflow: hidden;
-    }
-
-    .tab-btn {
-      border: none;
-      background: transparent;
-      color: var(--muted);
-      padding: 14px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .tab-btn.active {
-      background: rgba(255,159,10,0.16);
-      color: #fff;
-    }
-
-    .panel {
-      display: none;
-      width: 100%;
-    }
-
-    .panel.active {
-      display: block;
-    }
-
     .stats-panel {
-      padding: 14px;
+      padding: 16px;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 12px;
     }
 
     .stat-item {
@@ -147,8 +117,6 @@
       transition: transform 0.08s ease, box-shadow 0.2s ease, filter 0.2s ease;
       position: relative;
       overflow: hidden;
-      align-self: center;
-      margin-top: 8px;
     }
 
     #clickBtn:active {
@@ -167,23 +135,23 @@
     }
 
     .shop-container {
-      padding: 14px;
+      padding: 16px;
     }
 
     .shop-title {
-      margin: 0 0 10px 0;
+      margin: 0 0 12px 0;
       font-size: 18px;
-      font-weight: 800;
+      font-weight: 700;
       text-align: center;
     }
 
     .upgrade-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
       align-items: center;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
     }
 
     .upgrade-row:last-child {
@@ -192,24 +160,26 @@
 
     .upgrade-info {
       min-width: 0;
-      flex: 1;
     }
 
     .upgrade-name {
       display: block;
       font-weight: 700;
       font-size: 15px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .upgrade-desc {
       display: block;
       font-size: 12px;
-      color: var(--muted);
+      color: #a0a0aa;
       margin-top: 3px;
     }
 
     .upgrade-actions {
-      min-width: 108px;
+      min-width: 110px;
       display: flex;
       flex-direction: column;
       align-items: flex-end;
@@ -242,21 +212,25 @@
       background: rgba(255,255,255,0.06);
       color: #fff;
       cursor: pointer;
-      padding: 10px 12px;
+      padding: 10px 14px;
       border-radius: 12px;
       font-size: 14px;
       font-weight: 700;
+      transition: transform 0.15s ease, opacity 0.2s ease, background 0.2s ease;
       min-width: 92px;
+    }
+
+    .buy-btn:hover {
+      opacity: 0.95;
+    }
+
+    .buy-btn:active {
+      transform: scale(0.97);
     }
 
     .buy-btn:disabled {
       opacity: 0.35;
       cursor: not-allowed;
-    }
-
-    .buy-btn.owned {
-      background: var(--success);
-      color: #000;
     }
 
     .float-number {
@@ -281,88 +255,43 @@
     <div id="score">0</div>
     <div class="label">Монет: <span id="coins">0</span></div>
 
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="game">Игра</button>
-      <button class="tab-btn" data-tab="shop">Магазин</button>
+    <div class="stats-panel">
+      <div class="stat-item">
+        <div class="stat-label">Сила клика</div>
+        <div class="stat-value" id="statPower">1</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Доход/сек</div>
+        <div class="stat-value" id="statPerSec">0</div>
+      </div>
     </div>
 
-    <div class="panel active" id="gamePanel">
-      <div class="stats-panel">
-        <div class="stat-item">
-          <div class="stat-label">Сила клика</div>
-          <div class="stat-value" id="statPower">1</div>
+    <button id="clickBtn">КЛИК</button>
+
+    <div class="shop-container">
+      <h3 class="shop-title">Магазин улучшений</h3>
+
+      <div class="upgrade-row">
+        <div class="upgrade-info">
+          <span class="upgrade-name">Сила клика +1</span>
+          <span class="upgrade-desc">Каждый клик будет приносить больше монет</span>
         </div>
-        <div class="stat-item">
-          <div class="stat-label">Доход/сек</div>
-          <div class="stat-value" id="statPerSec">0</div>
+        <div class="upgrade-actions">
+          <span class="upgrade-price" id="pricePower">50</span>
+          <div class="progress-bar"><div class="progress-fill" id="progPower"></div></div>
+          <button class="buy-btn" id="btnBuyPower">Купить</button>
         </div>
       </div>
 
-      <button id="clickBtn">КЛИК</button>
-    </div>
-
-    <div class="panel" id="shopPanel">
-      <div class="shop-container">
-        <h3 class="shop-title">Магазин улучшений</h3>
-
-        <div class="upgrade-row">
-          <div class="upgrade-info">
-            <span class="upgrade-name">Сила клика +1</span>
-            <span class="upgrade-desc">Увеличивает доход за клик</span>
-          </div>
-          <div class="upgrade-actions">
-            <span class="upgrade-price" id="pricePower">25</span>
-            <div class="progress-bar"><div class="progress-fill" id="progPower"></div></div>
-            <button class="buy-btn" id="btnBuyPower">Купить</button>
-          </div>
+      <div class="upgrade-row">
+        <div class="upgrade-info">
+          <span class="upgrade-name">Автокликер</span>
+          <span class="upgrade-desc">Даёт доход автоматически каждую секунду</span>
         </div>
-
-        <div class="upgrade-row">
-          <div class="upgrade-info">
-            <span class="upgrade-name">Автокликер</span>
-            <span class="upgrade-desc">+1 монета в секунду</span>
-          </div>
-          <div class="upgrade-actions">
-            <span class="upgrade-price" id="priceAuto">50</span>
-            <div class="progress-bar"><div class="progress-fill" id="progAuto"></div></div>
-            <button class="buy-btn" id="btnBuyAuto">Купить</button>
-          </div>
-        </div>
-
-        <div class="upgrade-row">
-          <div class="upgrade-info">
-            <span class="upgrade-name">Усиление автоклика</span>
-            <span class="upgrade-desc">Удваивает доход от автоклика</span>
-          </div>
-          <div class="upgrade-actions">
-            <span class="upgrade-price" id="priceAutoBoost">120</span>
-            <div class="progress-bar"><div class="progress-fill" id="progAutoBoost"></div></div>
-            <button class="buy-btn" id="btnBuyAutoBoost">Купить</button>
-          </div>
-        </div>
-
-        <div class="upgrade-row">
-          <div class="upgrade-info">
-            <span class="upgrade-name">Крит-клик</span>
-            <span class="upgrade-desc">Иногда даёт x2 за клик</span>
-          </div>
-          <div class="upgrade-actions">
-            <span class="upgrade-price" id="priceCrit">80</span>
-            <div class="progress-bar"><div class="progress-fill" id="progCrit"></div></div>
-            <button class="buy-btn" id="btnBuyCrit">Купить</button>
-          </div>
-        </div>
-
-        <div class="upgrade-row">
-          <div class="upgrade-info">
-            <span class="upgrade-name">Скидка на магазин</span>
-            <span class="upgrade-desc">Снижает цены всех будущих покупок</span>
-          </div>
-          <div class="upgrade-actions">
-            <span class="upgrade-price" id="priceDiscount">150</span>
-            <div class="progress-bar"><div class="progress-fill" id="progDiscount"></div></div>
-            <button class="buy-btn" id="btnBuyDiscount">Купить</button>
-          </div>
+        <div class="upgrade-actions">
+          <span class="upgrade-price" id="priceAuto">100</span>
+          <div class="progress-bar"><div class="progress-fill" id="progAuto"></div></div>
+          <button class="buy-btn" id="btnBuyAuto">Купить</button>
         </div>
       </div>
     </div>
@@ -375,22 +304,15 @@
       tg.expand();
     }
 
-    const LS = {
+    const LS_KEYS = {
       coins: 'clicker_coins',
       power: 'clicker_power',
-      auto: 'clicker_auto',
-      autoBoost: 'clicker_autoBoost',
-      crit: 'clicker_crit',
-      discount: 'clicker_discount'
+      auto: 'clicker_auto'
     };
 
-    let coins = Number(localStorage.getItem(LS.coins) || 0);
-    let power = Number(localStorage.getItem(LS.power) || 1);
-    let autoEnabled = localStorage.getItem(LS.auto) === 'true';
-    let autoBoost = localStorage.getItem(LS.autoBoost) === 'true';
-    let critEnabled = localStorage.getItem(LS.crit) === 'true';
-    let discountEnabled = localStorage.getItem(LS.discount) === 'true';
-
+    let coins = Number(localStorage.getItem(LS_KEYS.coins) || 0);
+    let power = Number(localStorage.getItem(LS_KEYS.power) || 1);
+    let autoEnabled = localStorage.getItem(LS_KEYS.auto) === 'true';
     let autoInterval = null;
 
     const scoreEl = document.getElementById('score');
@@ -399,70 +321,29 @@
     const statPerSecEl = document.getElementById('statPerSec');
     const clickBtn = document.getElementById('clickBtn');
 
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const gamePanel = document.getElementById('gamePanel');
-    const shopPanel = document.getElementById('shopPanel');
-
     const btnBuyPower = document.getElementById('btnBuyPower');
-    const btnBuyAuto = document.getElementById('btnBuyAuto');
-    const btnBuyAutoBoost = document.getElementById('btnBuyAutoBoost');
-    const btnBuyCrit = document.getElementById('btnBuyCrit');
-    const btnBuyDiscount = document.getElementById('btnBuyDiscount');
-
     const pricePowerEl = document.getElementById('pricePower');
-    const priceAutoEl = document.getElementById('priceAuto');
-    const priceAutoBoostEl = document.getElementById('priceAutoBoost');
-    const priceCritEl = document.getElementById('priceCrit');
-    const priceDiscountEl = document.getElementById('priceDiscount');
-
     const progPowerEl = document.getElementById('progPower');
-    const progAutoEl = document.getElementById('progAuto');
-    const progAutoBoostEl = document.getElementById('progAutoBoost');
-    const progCritEl = document.getElementById('progCrit');
-    const progDiscountEl = document.getElementById('progDiscount');
 
-    function discountMul() {
-      return discountEnabled ? 0.85 : 1;
-    }
+    const btnBuyAuto = document.getElementById('btnBuyAuto');
+    const priceAutoEl = document.getElementById('priceAuto');
+    const progAutoEl = document.getElementById('progAuto');
 
     function getPowerCost() {
-      return Math.floor(25 * Math.pow(1.25, power - 1) * discountMul());
-    }
-
-    function getAutoCost() {
-      return Math.floor(50 * discountMul());
-    }
-
-    function getAutoBoostCost() {
-      return Math.floor(120 * discountMul());
-    }
-
-    function getCritCost() {
-      return Math.floor(80 * discountMul());
-    }
-
-    function getDiscountCost() {
-      return Math.floor(150 * discountMul());
+      return Math.floor(50 * Math.pow(1.35, power - 1));
     }
 
     function getAutoPerSec() {
-      let income = autoEnabled ? 1 : 0;
-      if (autoBoost && autoEnabled) income *= 2;
-      return income;
+      return autoEnabled ? power : 0;
     }
 
     function save() {
-      localStorage.setItem(LS.coins, String(coins));
-      localStorage.setItem(LS.power, String(power));
-      localStorage.setItem(LS.auto, String(autoEnabled));
-      localStorage.setItem(LS.autoBoost, String(autoBoost));
-      localStorage.setItem(LS.crit, String(critEnabled));
-      localStorage.setItem(LS.discount, String(discountEnabled));
+      localStorage.setItem(LS_KEYS.coins, String(coins));
+      localStorage.setItem(LS_KEYS.power, String(power));
+      localStorage.setItem(LS_KEYS.auto, String(autoEnabled));
 
       if (tg?.sendData) {
-        tg.sendData(JSON.stringify({
-          coins, power, autoEnabled, autoBoost, critEnabled, discountEnabled
-        }));
+        tg.sendData(JSON.stringify({ coins, power, autoEnabled }));
       }
     }
 
@@ -473,33 +354,17 @@
       statPerSecEl.textContent = getAutoPerSec();
 
       const costPower = getPowerCost();
-      const costAuto = getAutoCost();
-      const costAutoBoost = getAutoBoostCost();
-      const costCrit = getCritCost();
-      const costDiscount = getDiscountCost();
-
       pricePowerEl.textContent = costPower;
-      priceAutoEl.textContent = costAuto;
-      priceAutoBoostEl.textContent = costAutoBoost;
-      priceCritEl.textContent = costCrit;
-      priceDiscountEl.textContent = costDiscount;
-
       progPowerEl.style.width = Math.min(100, (coins / costPower) * 100) + '%';
-      progAutoEl.style.width = Math.min(100, (coins / costAuto) * 100) + '%';
-      progAutoBoostEl.style.width = Math.min(100, (coins / costAutoBoost) * 100) + '%';
-      progCritEl.style.width = Math.min(100, (coins / costCrit) * 100) + '%';
-      progDiscountEl.style.width = Math.min(100, (coins / costDiscount) * 100) + '%';
-
       btnBuyPower.disabled = coins < costPower;
-      btnBuyAuto.disabled = coins < costAuto || autoEnabled;
-      btnBuyAutoBoost.disabled = coins < costAutoBoost || autoBoost || !autoEnabled;
-      btnBuyCrit.disabled = coins < costCrit || critEnabled;
-      btnBuyDiscount.disabled = coins < costDiscount || discountEnabled;
 
+      const costAuto = 100;
+      priceAutoEl.textContent = costAuto;
+      progAutoEl.style.width = Math.min(100, (coins / costAuto) * 100) + '%';
+      btnBuyAuto.disabled = coins < costAuto || autoEnabled;
       btnBuyAuto.textContent = autoEnabled ? 'ВКЛ' : 'Купить';
-      btnBuyAutoBoost.textContent = autoBoost ? 'ВКЛ' : 'Купить';
-      btnBuyCrit.textContent = critEnabled ? 'ВКЛ' : 'Купить';
-      btnBuyDiscount.textContent = discountEnabled ? 'ВКЛ' : 'Купить';
+      btnBuyAuto.style.background = autoEnabled ? 'var(--success)' : '';
+      btnBuyAuto.style.color = autoEnabled ? '#000' : '';
 
       clickBtn.classList.toggle('autopulse', autoEnabled);
     }
@@ -518,32 +383,15 @@
       clearInterval(autoInterval);
       autoInterval = setInterval(() => {
         if (!autoEnabled) return;
-        let gain = 1;
-        if (autoBoost) gain *= 2;
-        coins += gain;
+        coins += power;
         save();
         updateUI();
       }, 1000);
     }
 
-    tabBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        tabBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-
-        const tab = btn.dataset.tab;
-        gamePanel.classList.toggle('active', tab === 'game');
-        shopPanel.classList.toggle('active', tab === 'shop');
-      });
-    });
-
     clickBtn.addEventListener('click', (e) => {
-      let gain = power;
-      if (critEnabled && Math.random() < 0.15) {
-        gain *= 2;
-      }
-      coins += gain;
-      createFloatNumber(gain, e.clientX, e.clientY);
+      coins += power;
+      createFloatNumber(power, e.clientX, e.clientY);
       save();
       updateUI();
     });
@@ -559,41 +407,10 @@
     });
 
     btnBuyAuto.addEventListener('click', () => {
-      const cost = getAutoCost();
-      if (!autoEnabled && coins >= cost) {
-        coins -= cost;
+      if (!autoEnabled && coins >= 100) {
+        coins -= 100;
         autoEnabled = true;
         startAutoClick();
-        save();
-        updateUI();
-      }
-    });
-
-    btnBuyAutoBoost.addEventListener('click', () => {
-      const cost = getAutoBoostCost();
-      if (autoEnabled && !autoBoost && coins >= cost) {
-        coins -= cost;
-        autoBoost = true;
-        save();
-        updateUI();
-      }
-    });
-
-    btnBuyCrit.addEventListener('click', () => {
-      const cost = getCritCost();
-      if (!critEnabled && coins >= cost) {
-        coins -= cost;
-        critEnabled = true;
-        save();
-        updateUI();
-      }
-    });
-
-    btnBuyDiscount.addEventListener('click', () => {
-      const cost = getDiscountCost();
-      if (!discountEnabled && coins >= cost) {
-        coins -= cost;
-        discountEnabled = true;
         save();
         updateUI();
       }
