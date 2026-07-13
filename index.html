@@ -15,6 +15,8 @@
         --accent: #ff9f0a;
         --success: #4caf50;
         --danger: #ff5252;
+        --rare: #8e44ad;
+        --legendary: #d35400;
       }
       body {
         background: var(--bg);
@@ -27,37 +29,38 @@
         height: 100vh;
         margin: 0;
         overflow: hidden;
-        padding: 12px;
+        padding: 16px;
         box-sizing: border-box;
       }
 
-      /* --- Счёт --- */
       #score {
-        font-size: 56px;
+        font-size: 64px;
         font-weight: 700;
         line-height: 1;
         text-align: center;
         margin-bottom: 4px;
+        text-shadow: 0 4px 12px rgba(0,0,0,0.4);
       }
       .label {
         color: #aaaaaa;
         font-size: 14px;
         text-align: center;
-        margin-bottom: 28px;
+        margin-bottom: 24px;
       }
 
-      /* --- Статистика --- */
       .stats-panel {
         width: 100%;
         max-width: 360px;
-        background: var(--secondary);
-        border-radius: 16px;
+        background: rgba(44, 44, 48, 0.6);
+        backdrop-filter: blur(12px);
+        border-radius: 18px;
         padding: 16px;
         border: 1px solid var(--border);
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 12px;
         margin-bottom: 20px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.3);
       }
       .stat-item { text-align: center; }
       .stat-label {
@@ -67,26 +70,27 @@
         letter-spacing: 0.5px;
       }
       .stat-value {
-        font-weight: bold;
-        font-size: 22px;
+        font-weight: 700;
+        font-size: 26px;
         color: var(--accent);
+        text-shadow: 0 2px 6px rgba(255,159,10,0.3);
       }
 
-      /* --- Кнопка клика --- */
       button#clickBtn {
-        width: 240px;
-        height: 240px;
-        border-radius: 50%;
+        width: 260px;
+        height: 260px;
+        border-radius: 54px;
         border: none;
-        background-color: var(--btn);
+        background: linear-gradient(135deg, var(--btn), #e68a00);
         color: var(--btn-text);
-        font-size: 32px;
+        font-size: 34px;
         cursor: pointer;
-        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 16px 40px rgba(255, 159, 10, 0.35);
         user-select: none;
-        transition: transform 0.06s, box-shadow 0.2s;
+        transition: transform 0.06s, box-shadow 0.2s, filter 0.2s;
         position: relative;
         z-index: 2;
+        overflow: hidden;
       }
       button#clickBtn:active { transform: scale(0.94); }
       button#clickBtn.autopulse {
@@ -98,27 +102,28 @@
         100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
       }
 
-      /* --- Магазин --- */
       .shop-container {
         width: 100%;
-        max-width: 360px;
+        max-width: 380px;
         background: var(--secondary);
-        border-radius: 16px;
-        padding: 16px;
+        border-radius: 20px;
+        padding: 20px;
         border: 1px solid var(--border);
+        box-shadow: 0 12px 32px rgba(0,0,0,0.25);
       }
       .shop-title {
-        margin: 0 0 16px 0;
-        font-size: 18px;
-        font-weight: 600;
+        margin: 0 0 18px 0;
+        font-size: 20px;
+        font-weight: 700;
         text-align: center;
+        color: var(--text);
       }
       .upgrade-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 12px 0;
-        border-bottom: 1px solid var(--border);
+        padding: 14px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.04);
       }
       .upgrade-row:last-child { border-bottom: none; }
       .upgrade-info {
@@ -127,11 +132,26 @@
         min-width: 0;
       }
       .upgrade-name {
-        font-weight: 600;
+        font-weight: 700;
+        font-size: 16px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        display: flex;
+        align-items: center;
+        gap: 8px;
       }
+      .badge {
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: white;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+      .badge-common { background: #666; }
+      .badge-rare { background: var(--rare); }
+      .badge-legendary { background: var(--legendary); }
       .upgrade-desc {
         font-size: 12px;
         color: #aaa;
@@ -139,29 +159,30 @@
       }
       .upgrade-price-box {
         text-align: right;
-        min-width: 90px;
+        min-width: 96px;
         display: flex;
         flex-direction: column;
         align-items: flex-end;
       }
       .upgrade-price {
-        font-weight: bold;
+        font-weight: 700;
+        font-size: 16px;
         color: var(--accent);
-        font-size: 15px;
       }
       .progress-bar {
         width: 100%;
-        height: 4px;
-        background: #444;
-        border-radius: 2px;
-        margin-top: 6px;
+        height: 6px;
+        background: #3a3a40;
+        border-radius: 3px;
+        margin-top: 8px;
         overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.08);
       }
       .progress-fill {
         height: 100%;
-        background: var(--success);
+        background: linear-gradient(90deg, var(--accent), #ffcc00);
         width: 0%;
-        transition: width 0.3s;
+        transition: width 0.4s ease-out;
       }
       
       button.buy-btn {
@@ -169,41 +190,52 @@
         background: transparent;
         color: white;
         cursor: pointer;
-        padding: 8px 16px;
-        border-radius: 8px;
+        padding: 10px 18px;
+        border-radius: 10px;
         font-size: 14px;
-        font-weight: 600;
-        transition: opacity 0.2s;
+        font-weight: 700;
+        transition: all 0.2s;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
       }
-      button.buy-btn:hover { opacity: 0.9; }
+      button.buy-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+      }
       button.buy-btn:disabled {
         opacity: 0.4;
         cursor: not-allowed;
-        color: #666;
+        filter: grayscale(1);
+        box-shadow: none;
+      }
+      button.toggle-btn {
+        background: var(--danger) !important;
+        color: white !important;
+        width: 100%;
+      }
+      button.toggle-btn:hover {
+        background: #cc4444 !important;
       }
 
-      /* --- Эффекты --- */
       .float-number {
         position: absolute;
         pointer-events: none;
-        font-weight: bold;
+        font-weight: 700;
         color: var(--accent);
-        font-size: 26px;
+        font-size: 30px;
         animation: floatUp 1s forwards;
         z-index: 3;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.4);
       }
       @keyframes floatUp {
         0% { opacity: 1; transform: translateY(0) scale(1); }
-        100% { opacity: 0; transform: translateY(-100px) scale(1.4); }
+        100% { opacity: 0; transform: translateY(-120px) scale(1.5); }
       }
     </style>
   </head>
   <body>
-    <!-- Счёт -->
     <div id="score">0</div>
     <div class="label">Монет: <span id="coins">0</span></div>
 
-    <!-- Статистика -->
     <div class="stats-panel">
       <div class="stat-item">
         <div class="stat-label">Сила клика</div>
@@ -215,16 +247,14 @@
       </div>
     </div>
 
-    <!-- Кнопка клика -->
     <button id="clickBtn">КЛИК</button>
 
-    <!-- Магазин -->
     <div class="shop-container">
       <h3 class="shop-title">Магазин улучшений</h3>
 
       <div class="upgrade-row">
         <div class="upgrade-info">
-          <span class="upgrade-name">Сила клика +1</span>
+          <span class="upgrade-name">💪 Сила клика +1</span>
           <span class="upgrade-desc">Каждый клик приносит на 1 больше</span>
         </div>
         <div class="upgrade-price-box">
@@ -236,14 +266,50 @@
 
       <div class="upgrade-row">
         <div class="upgrade-info">
-          <span class="upgrade-name">Автокликер</span>
-          <span class="upgrade-desc">+1 монета каждую секунду</span>
+          <span class="upgrade-name"><span class="badge badge-rare">Rare</span> 🤖 Автокликер</span>
+          <span class="upgrade-desc">Автоматически даёт монеты каждую секунду (зависит от силы клика)</span>
         </div>
         <div class="upgrade-price-box">
           <span class="upgrade-price" id="priceAuto">100</span>
           <div class="progress-bar"><div class="progress-fill" id="progAuto"></div></div>
         </div>
-        <button class="buy-btn" id="btnBuyAuto">Купить</button>
+        <button class="buy-btn" id="btnToggleAuto">Купить</button>
+      </div>
+
+      <div class="upgrade-row">
+        <div class="upgrade-info">
+          <span class="upgrade-name"><span class="badge badge-rare">Rare</span> 💥 Мультиклик</span>
+          <span class="upgrade-desc">За каждый клик получаешь дополнительно +2 монеты</span>
+        </div>
+        <div class="upgrade-price-box">
+          <span class="upgrade-price" id="priceMulti">200</span>
+          <div class="progress-bar"><div class="progress-fill" id="progMulti"></div></div>
+        </div>
+        <button class="buy-btn" id="btnBuyMulti">Купить</button>
+      </div>
+
+      <div class="upgrade-row">
+        <div class="upgrade-info">
+          <span class="upgrade-name"><span class="badge badge-legendary">Legendary</span> ⚡ Ускоритель</span>
+          <span class="upgrade-desc">Автокликер срабатывает каждые 500 мс вместо 1000 мс</span>
+        </div>
+        <div class="upgrade-price-box">
+          <span class="upgrade-price" id="priceSpeed">500</span>
+          <div class="progress-bar"><div class="progress-fill" id="progSpeed"></div></div>
+        </div>
+        <button class="buy-btn" id="btnBuySpeed">Купить</button>
+      </div>
+
+      <div class="upgrade-row">
+        <div class="upgrade-info">
+          <span class="upgrade-name"><span class="badge badge-legendary">Legendary</span> 🎁 Супер бонус</span>
+          <span class="upgrade-desc">Мгновенно +500 монет</span>
+        </div>
+        <div class="upgrade-price-box">
+          <span class="upgrade-price" id="priceBonus">500</span>
+          <div class="progress-bar"><div class="progress-fill" id="progBonus"></div></div>
+        </div>
+        <button class="buy-btn" id="btnBuyBonus">Купить</button>
       </div>
     </div>
 
@@ -252,10 +318,11 @@
       tg.ready();
       tg.expand();
 
-      // Загрузка данных
       let coins = parseInt(localStorage.getItem('clicker_coins')) || 0;
       let power = parseInt(localStorage.getItem('clicker_power')) || 1;
       let autoEnabled = localStorage.getItem('clicker_auto') === 'true';
+      let multiClick = localStorage.getItem('clicker_multi') === 'true';
+      let speedBoost = localStorage.getItem('clicker_speed') === 'true';
       let autoInterval = null;
 
       const scoreEl = document.getElementById('score');
@@ -268,107 +335,32 @@
       const pricePowerEl = document.getElementById('pricePower');
       const progPowerEl = document.getElementById('progPower');
 
-      const btnBuyAuto = document.getElementById('btnBuyAuto');
+      const btnToggleAuto = document.getElementById('btnToggleAuto');
       const priceAutoEl = document.getElementById('priceAuto');
       const progAutoEl = document.getElementById('progAuto');
+
+      const btnBuyMulti = document.getElementById('btnBuyMulti');
+      const priceMultiEl = document.getElementById('priceMulti');
+      const progMultiEl = document.getElementById('progMulti');
+
+      const btnBuySpeed = document.getElementById('btnBuySpeed');
+      const priceSpeedEl = document.getElementById('priceSpeed');
+      const progSpeedEl = document.getElementById('progSpeed');
+
+      const btnBuyBonus = document.getElementById('btnBuyBonus');
+      const priceBonusEl = document.getElementById('priceBonus');
+      const progBonusEl = document.getElementById('progBonus');
 
       function save() {
         localStorage.setItem('clicker_coins', coins);
         localStorage.setItem('clicker_power', power);
         localStorage.setItem('clicker_auto', autoEnabled);
+        localStorage.setItem('clicker_multi', multiClick);
+        localStorage.setItem('clicker_speed', speedBoost);
 
-        // Отправляем данные боту
-        tg.sendData(JSON.stringify({ coins, power, autoEnabled }));
+        tg.sendData(JSON.stringify({ coins, power, autoEnabled, multiClick, speedBoost }));
       }
 
       function updateUI() {
         scoreEl.textContent = coins;
-        coinsEl.textContent = coins;
-        statPowerEl.textContent = power;
-        
-        const perSec = autoEnabled ? power : 0; // упрощённо: автоклик даёт +power в сек
-        statPerSecEl.textContent = perSec;
-
-        // Сила клика
-        const costPower = 50 * power; // цена растёт с каждым уровнем
-        pricePowerEl.textContent = costPower;
-        progPowerEl.style.width = Math.min(100, (coins / costPower) * 100) + '%';
-        btnBuyPower.disabled = coins < costPower;
-
-        // Автокликер
-        const costAuto = 100;
-        priceAutoEl.textContent = costAuto;
-        progAutoEl.style.width = Math.min(100, (coins / costAuto) * 100) + '%';
-        btnBuyAuto.disabled = coins < costAuto || autoEnabled;
-        if (autoEnabled) {
-          btnBuyAuto.textContent = 'ВКЛ';
-          btnBuyAuto.style.background = 'var(--success)';
-          btnBuyAuto.style.color = '#000';
-        } else {
-          btnBuyAuto.textContent = 'Купить';
-          btnBuyAuto.style.background = '';
-          btnBuyAuto.style.color = '';
-        }
-
-        clickBtn.classList.toggle('autopulse', autoEnabled);
-      }
-
-      updateUI();
-
-      // Клик
-      clickBtn.addEventListener('click', (e) => {
-        coins += power;
-        createFloatNumber(power, e.clientX, e.clientY);
-        save();
-        updateUI();
-      });
-
-      // Купить силу клика
-      btnBuyPower.addEventListener('click', () => {
-        const cost = 50 * power;
-        if (coins >= cost) {
-          coins -= cost;
-          power++;
-          save();
-          updateUI();
-        }
-      });
-
-      // Купить автокликер
-      btnBuyAuto.addEventListener('click', () => {
-        if (!autoEnabled && coins >= 100) {
-          coins -= 100;
-          autoEnabled = true;
-          startAutoClick();
-          save();
-          updateUI();
-        }
-      });
-
-      function startAutoClick() {
-        clearInterval(autoInterval);
-        autoInterval = setInterval(() => {
-          if (autoEnabled) {
-            coins += power; // автоклик тоже зависит от силы клика
-            updateUI();
-            save();
-          }
-        }, 1000);
-      }
-
-      if (autoEnabled) startAutoClick();
-
-      // Эффект всплывающих цифр
-      function createFloatNumber(amount, x, y) {
-        const el = document.createElement('div');
-        el.className = 'float-number';
-        el.textContent = '+' + amount;
-        el.style.left = x + 'px';
-        el.style.top = y + 'px';
-        document.body.appendChild(el);
-
-        setTimeout(() => el.remove(), 1000);
-      }
-    </script>
-  </body>
-</html>
+        coins
