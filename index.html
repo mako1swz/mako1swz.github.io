@@ -11,11 +11,12 @@
         --btn: var(--tg-theme-button-color, #ff9f0a);
         --btn-text: var(--tg-theme-button-text-color, #000000);
         --secondary: #333335;
+        --border: var(--tg-theme-hint-color, #555555);
       }
       body {
         background: var(--bg);
         color: var(--text);
-        font-family: sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -30,7 +31,7 @@
       /* Вкладки */
       .tabs {
         width: 100%;
-        max-width: 320px;
+        max-width: 360px;
         display: flex;
         gap: 8px;
         margin-bottom: 24px;
@@ -41,8 +42,9 @@
         background: rgba(255,255,255,0.08);
         color: var(--text);
         padding: 12px;
-        border-radius: 12px;
+        border-radius: 14px;
         font-size: 15px;
+        font-weight: 600;
         cursor: pointer;
         transition: all 0.2s;
       }
@@ -53,31 +55,108 @@
       .tab-btn:active { transform: scale(0.96); }
 
       #score {
-        font-size: 64px;
-        font-weight: bold;
-        margin-bottom: 16px;
+        font-size: 72px;
+        font-weight: 700;
+        line-height: 1;
+        text-align: center;
+        margin-bottom: 8px;
+        text-shadow: 0 4px 12px rgba(0,0,0,0.4);
       }
-      .label { color: #aaaaaa; margin-bottom: 32px; }
+      .label { color: #aaaaaa; margin-bottom: 28px; text-align: center; }
+
       button#clickBtn {
-        width: 200px;
-        height: 200px;
+        width: 220px;
+        height: 220px;
         border-radius: 50%;
         border: none;
-        background-color: var(--btn);
+        background: linear-gradient(135deg, var(--btn), #e68a00);
         color: var(--btn-text);
         font-size: 28px;
+        font-weight: 700;
         cursor: pointer;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        box-shadow: 0 12px 32px rgba(255,159,10,0.35);
         user-select: none;
-        transition: transform 0.1s;
+        transition: transform 0.06s, box-shadow 0.2s;
+        position: relative;
+        z-index: 2;
       }
-      button#clickBtn:active { transform: scale(0.96); }
+      button#clickBtn:active { transform: scale(0.94); }
 
+      /* Всплывающие числа */
+      .float-number {
+        position: absolute;
+        pointer-events: none;
+        font-weight: 700;
+        color: var(--accent, #ff9f0a);
+        font-size: 32px;
+        animation: floatUp 0.8s forwards;
+        z-index: 3;
+        text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      }
+      @keyframes floatUp {
+        0% { opacity: 1; transform: translateY(0) scale(1); }
+        100% { opacity: 0; transform: translateY(-140px) scale(1.4); }
+      }
+
+      /* Магазин */
       .shop-container {
         width: 100%;
-        max-width: 320px;
+        max-width: 360px;
       }
-      .upgrade-btn {
+      h3 { margin: 0 0 16px 0; color: var(--text); font-weight: 700; text-align: center; }
+      .upgrade-card {
+        background: rgba(255,255,255,0.04);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 14px;
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .upgrade-info {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+      .upgrade-name {
+        font-weight: 700;
+        font-size: 16px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .upgrade-desc {
+        font-size: 13px;
+        color: #aaa;
+        margin-top: 4px;
+      }
+      .upgrade-controls {
+        text-align: right;
+        min-width: 90px;
+      }
+      .upgrade-price {
+        font-weight: 700;
+        font-size: 16px;
+        color: var(--accent, #ff9f0a);
+        display: block;
+        margin-bottom: 6px;
+      }
+      .progress-bar-bg {
+        width: 100%;
+        height: 6px;
+        background: #3a3a40;
+        border-radius: 3px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.08);
+      }
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--btn), #ffcc00);
+        width: 0%;
+        transition: width 0.4s ease-out;
+      }
+      .buy-btn {
         width: 100%;
         background: var(--secondary);
         color: white;
@@ -85,18 +164,18 @@
         padding: 12px;
         border-radius: 10px;
         cursor: pointer;
-        margin-bottom: 8px;
         font-size: 15px;
-        text-align: left;
+        font-weight: 700;
+        margin-top: 10px;
+        transition: all 0.2s;
       }
-      .upgrade-btn:disabled {
+      .buy-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.25); }
+      .buy-btn:disabled {
         opacity: 0.4;
         cursor: not-allowed;
+        filter: grayscale(1);
       }
-      .upgrade-price {
-        float: right;
-        font-weight: bold;
-      }
+      .buy-btn.enabled { background: var(--btn); color: var(--btn-text); }
 
       /* Скрытие неактивных экранов */
       .view { display: none; text-align: center; }
@@ -121,8 +200,32 @@
     <div id="viewShop" class="view">
       <div class="shop-container">
         <h3>Улучшения</h3>
-        <button class="upgrade-btn" id="buyAuto">Автокликер (100 монет)</button>
-        <button class="upgrade-btn" id="buyPower">Сила клика +1 (50 монет)</button>
+
+        <!-- Сила клика -->
+        <div class="upgrade-card">
+          <div class="upgrade-info">
+            <span class="upgrade-name">💪 Сила клика +1</span>
+            <span class="upgrade-desc">Каждый клик приносит на 1 больше</span>
+          </div>
+          <div class="upgrade-controls">
+            <span class="upgrade-price" id="pricePower">50</span>
+            <div class="progress-bar-bg"><div class="progress-fill" id="progPower"></div></div>
+          </div>
+        </div>
+        <button class="buy-btn" id="btnBuyPower">Купить</button>
+
+        <!-- Автокликер -->
+        <div class="upgrade-card">
+          <div class="upgrade-info">
+            <span class="upgrade-name">🤖 Автокликер</span>
+            <span class="upgrade-desc">Даёт монеты каждую секунду (зависит от силы клика)</span>
+          </div>
+          <div class="upgrade-controls">
+            <span class="upgrade-price" id="priceAuto">100</span>
+            <div class="progress-bar-bg"><div class="progress-fill" id="progAuto"></div></div>
+          </div>
+        </div>
+        <button class="buy-btn" id="btnBuyAuto">Купить</button>
       </div>
     </div>
 
@@ -140,8 +243,13 @@
       const scoreEl = document.getElementById('score');
       const coinsEl = document.getElementById('coins');
       const btn = document.getElementById('clickBtn');
-      const buyAuto = document.getElementById('buyAuto');
-      const buyPower = document.getElementById('buyPower');
+      const btnBuyPower = document.getElementById('btnBuyPower');
+      const btnBuyAuto = document.getElementById('btnBuyAuto');
+
+      const pricePowerEl = document.getElementById('pricePower');
+      const progPowerEl = document.getElementById('progPower');
+      const priceAutoEl = document.getElementById('priceAuto');
+      const progAutoEl = document.getElementById('progAuto');
 
       // Вкладки
       const tabGame = document.getElementById('tabGame');
@@ -153,53 +261,76 @@
         localStorage.setItem('clicker_coins', coins);
         localStorage.setItem('clicker_power', power);
         localStorage.setItem('clicker_auto', autoClickEnabled);
-
-        // Отправляем прогресс боту
         tg.sendData(JSON.stringify({ coins, power, autoClickEnabled }));
       }
+
+      // Автосохранение каждые 10 секунд
+      setInterval(save, 10000);
 
       function updateUI() {
         scoreEl.textContent = coins;
         coinsEl.textContent = coins;
 
-        // Логика кнопки автокликера
-        if (autoClickEnabled) {
-          buyAuto.textContent = 'Автокликер: ВКЛ';
-          buyAuto.style.background = '#4caf50';
-          buyAuto.disabled = true;
-        } else {
-          buyAuto.textContent = `Автокликер (${100} монет)`;
-          buyAuto.style.background = '';
-          buyAuto.disabled = coins < 100;
-        }
+        // Цена и прогресс силы клика
+        const costPower = 50;
+        pricePowerEl.textContent = costPower;
+        progPowerEl.style.width = `${Math.min(100, (coins / costPower) * 100)}%`;
+        btnBuyPower.disabled = coins < costPower;
+        btnBuyPower.classList.toggle('enabled', !btnBuyPower.disabled);
 
-        // Логика кнопки силы клика
-        buyPower.textContent = `Сила клика: ${power} (следующее: 50 монет)`;
-        buyPower.disabled = coins < 50;
+        // Цена и прогресс автокликера
+        const costAuto = 100;
+        priceAutoEl.textContent = costAuto;
+        progAutoEl.style.width = `${Math.min(100, (coins / costAuto) * 100)}%`;
+
+        if (autoClickEnabled) {
+          btnBuyAuto.textContent = 'Автокликер: ВКЛ';
+          btnBuyAuto.disabled = true;
+          btnBuyAuto.classList.remove('enabled');
+        } else {
+          btnBuyAuto.disabled = coins < costAuto;
+          btnBuyAuto.textContent = 'Купить';
+          btnBuyAuto.classList.toggle('enabled', !btnBuyAuto.disabled);
+        }
       }
 
       updateUI();
 
+      // Всплывающее число
+      function showFloat(amount) {
+        const el = document.createElement('div');
+        el.className = 'float-number';
+        el.textContent = '+' + amount;
+        const btnRect = btn.getBoundingClientRect();
+        const midX = btnRect.left + btnRect.width / 2;
+        const midY = btnRect.top + btnRect.height / 2;
+        el.style.left = midX + 'px';
+        el.style.top = midY + 'px';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 800);
+      }
+
       btn.addEventListener('click', () => {
         coins += power;
+        showFloat(power);
         updateUI();
         save();
       });
 
-      buyAuto.addEventListener('click', () => {
-        if (!autoClickEnabled && coins >= 100) {
-          coins -= 100;
-          autoClickEnabled = true;
-          startAutoClick();
+      btnBuyPower.addEventListener('click', () => {
+        if (!btnBuyPower.disabled) {
+          coins -= 50;
+          power++;
           updateUI();
           save();
         }
       });
 
-      buyPower.addEventListener('click', () => {
-        if (coins >= 50) {
-          coins -= 50;
-          power++;
+      btnBuyAuto.addEventListener('click', () => {
+        if (!autoClickEnabled && !btnBuyAuto.disabled) {
+          coins -= 100;
+          autoClickEnabled = true;
+          startAutoClick();
           updateUI();
           save();
         }
