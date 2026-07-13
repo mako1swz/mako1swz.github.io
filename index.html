@@ -31,7 +31,6 @@
         box-sizing: border-box;
       }
 
-      /* --- Счёт --- */
       #score {
         font-size: 56px;
         font-weight: 700;
@@ -46,7 +45,6 @@
         margin-bottom: 28px;
       }
 
-      /* --- Статистика --- */
       .stats-panel {
         width: 100%;
         max-width: 360px;
@@ -72,7 +70,6 @@
         color: var(--accent);
       }
 
-      /* --- Кнопка клика --- */
       button#clickBtn {
         width: 240px;
         height: 240px;
@@ -98,7 +95,6 @@
         100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
       }
 
-      /* --- Магазин --- */
       .shop-container {
         width: 100%;
         max-width: 360px;
@@ -173,7 +169,7 @@
         border-radius: 8px;
         font-size: 14px;
         font-weight: 600;
-        transition: opacity 0.2s;
+        transition: opacity 0.2s, background 0.2s;
       }
       button.buy-btn:hover { opacity: 0.9; }
       button.buy-btn:disabled {
@@ -182,7 +178,16 @@
         color: #666;
       }
 
-      /* --- Эффекты --- */
+      /* Кнопка «Выключить» — отдельный стиль */
+      button.toggle-btn {
+        background: var(--danger);
+        color: white !important;
+        width: 100%;
+      }
+      button.toggle-btn:hover {
+        background: #cc4444 !important;
+      }
+
       .float-number {
         position: absolute;
         pointer-events: none;
@@ -243,7 +248,8 @@
           <span class="upgrade-price" id="priceAuto">100</span>
           <div class="progress-bar"><div class="progress-fill" id="progAuto"></div></div>
         </div>
-        <button class="buy-btn" id="btnBuyAuto">Купить</button>
+        <!-- Кнопка меняется динамически: Купить / Выключить -->
+        <button class="buy-btn" id="btnToggleAuto">Купить</button>
       </div>
     </div>
 
@@ -252,7 +258,6 @@
       tg.ready();
       tg.expand();
 
-      // Загрузка данных
       let coins = parseInt(localStorage.getItem('clicker_coins')) || 0;
       let power = parseInt(localStorage.getItem('clicker_power')) || 1;
       let autoEnabled = localStorage.getItem('clicker_auto') === 'true';
@@ -268,7 +273,7 @@
       const pricePowerEl = document.getElementById('pricePower');
       const progPowerEl = document.getElementById('progPower');
 
-      const btnBuyAuto = document.getElementById('btnBuyAuto');
+      const btnToggleAuto = document.getElementById('btnToggleAuto');
       const priceAutoEl = document.getElementById('priceAuto');
       const progAutoEl = document.getElementById('progAuto');
 
@@ -276,8 +281,6 @@
         localStorage.setItem('clicker_coins', coins);
         localStorage.setItem('clicker_power', power);
         localStorage.setItem('clicker_auto', autoEnabled);
-
-        // Отправляем данные боту
         tg.sendData(JSON.stringify({ coins, power, autoEnabled }));
       }
 
@@ -286,11 +289,11 @@
         coinsEl.textContent = coins;
         statPowerEl.textContent = power;
         
-        const perSec = autoEnabled ? power : 0; // упрощённо: автоклик даёт +power в сек
+        const perSec = autoEnabled ? power : 0;
         statPerSecEl.textContent = perSec;
 
         // Сила клика
-        const costPower = 50 * power; // цена растёт с каждым уровнем
+        const costPower = 50 * power;
         pricePowerEl.textContent = costPower;
         progPowerEl.style.width = Math.min(100, (coins / costPower) * 100) + '%';
         btnBuyPower.disabled = coins < costPower;
@@ -299,15 +302,15 @@
         const costAuto = 100;
         priceAutoEl.textContent = costAuto;
         progAutoEl.style.width = Math.min(100, (coins / costAuto) * 100) + '%';
-        btnBuyAuto.disabled = coins < costAuto || autoEnabled;
+
         if (autoEnabled) {
-          btnBuyAuto.textContent = 'ВКЛ';
-          btnBuyAuto.style.background = 'var(--success)';
-          btnBuyAuto.style.color = '#000';
+          btnToggleAuto.textContent = 'Выключить';
+          btnToggleAuto.classList.add('toggle-btn');
+          btnToggleAuto.disabled = false;
         } else {
-          btnBuyAuto.textContent = 'Купить';
-          btnBuyAuto.style.background = '';
-          btnBuyAuto.style.color = '';
+          btnToggleAuto.textContent = 'Купить';
+          btnToggleAuto.classList.remove('toggle-btn');
+          btnToggleAuto.disabled = coins < costAuto;
         }
 
         clickBtn.classList.toggle('autopulse', autoEnabled);
@@ -315,7 +318,6 @@
 
       updateUI();
 
-      // Клик
       clickBtn.addEventListener('click', (e) => {
         coins += power;
         createFloatNumber(power, e.clientX, e.clientY);
@@ -323,7 +325,6 @@
         updateUI();
       });
 
-      // Купить силу клика
       btnBuyPower.addEventListener('click', () => {
         const cost = 50 * power;
         if (coins >= cost) {
@@ -334,14 +335,25 @@
         }
       });
 
-      // Купить автокликер
-      btnBuyAuto.addEventListener('click', () => {
-        if (!autoEnabled && coins >= 100) {
-          coins -= 100;
-          autoEnabled = true;
-          startAutoClick();
+      // Теперь это кнопка-переключатель: купить или выключить
+      btnToggleAuto.addEventListener('click', () => {
+        if (autoEnabled) {
+          // Выключаем автоклик
+          autoEnabled = false;
+          clearInterval(autoInterval);
+          autoInterval = null;
           save();
           updateUI();
+        } else {
+          // Покупаем автокликер
+          const cost = 100;
+          if (coins >= cost) {
+            coins -= cost;
+            autoEnabled = true;
+            startAutoClick();
+            save();
+            updateUI();
+          }
         }
       });
 
@@ -349,7 +361,7 @@
         clearInterval(autoInterval);
         autoInterval = setInterval(() => {
           if (autoEnabled) {
-            coins += power; // автоклик тоже зависит от силы клика
+            coins += power;
             updateUI();
             save();
           }
@@ -358,7 +370,6 @@
 
       if (autoEnabled) startAutoClick();
 
-      // Эффект всплывающих цифр
       function createFloatNumber(amount, x, y) {
         const el = document.createElement('div');
         el.className = 'float-number';
@@ -366,10 +377,8 @@
         el.style.left = x + 'px';
         el.style.top = y + 'px';
         document.body.appendChild(el);
-
         setTimeout(() => el.remove(), 1000);
       }
     </script>
   </body>
 </html>
-
