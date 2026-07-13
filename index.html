@@ -10,6 +10,7 @@
         --text: var(--tg-theme-text-color, #ffffff);
         --btn: var(--tg-theme-button-color, #ff9f0a);
         --btn-text: var(--tg-theme-button-text-color, #000000);
+        --secondary: #333335;
       }
       body {
         background: var(--bg);
@@ -26,8 +27,9 @@
       #score {
         font-size: 64px;
         font-weight: bold;
-        margin-bottom: 30px;
+        margin-bottom: 16px;
       }
+      .label { color: #aaaaaa; margin-bottom: 32px; }
       button#clickBtn {
         width: 200px;
         height: 200px;
@@ -39,46 +41,130 @@
         cursor: pointer;
         box-shadow: 0 8px 24px rgba(0,0,0,0.3);
         user-select: none;
+        transition: transform 0.1s;
       }
-      button#clickBtn:active {
-        transform: scale(0.96);
+      button#clickBtn:active { transform: scale(0.96); }
+      .shop-container {
+        margin-top: 32px;
+        text-align: center;
       }
-      .label { color: #aaaaaa; margin-top: 12px; }
+      .upgrade-btn {
+        background: var(--secondary);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin: 4px;
+        font-size: 14px;
+      }
+      .upgrade-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
     </style>
   </head>
   <body>
     <div id="score">0</div>
-    <button id="clickBtn">КЛИК</button>
     <div class="label">Монет: <span id="coins">0</span></div>
+
+    <button id="clickBtn">КЛИК</button>
+
+    <div class="shop-container">
+      <h3>Улучшения</h3>
+      <button class="upgrade-btn" id="buyAuto" disabled>Автокликер (100 монет)</button>
+      <button class="upgrade-btn" id="buyPower" disabled>Сила клика +1 (50 монет)</button>
+    </div>
 
     <script>
       const tg = window.Telegram.WebApp;
       tg.ready();
-      tg.expand(); // развернуть на весь экран
+      tg.expand();
 
+      // Загрузка сохранений
       let coins = parseInt(localStorage.getItem('clicker_coins')) || 0;
+      let power = parseInt(localStorage.getItem('clicker_power')) || 1;
+      let autoClickEnabled = localStorage.getItem('clicker_auto') === 'true';
+      let autoInterval = null;
+
       const scoreEl = document.getElementById('score');
       const coinsEl = document.getElementById('coins');
       const btn = document.getElementById('clickBtn');
+      const buyAuto = document.getElementById('buyAuto');
+      const buyPower = document.getElementById('buyPower');
 
       function save() {
         localStorage.setItem('clicker_coins', coins);
-        // Можно отправлять прогресс боту:
-        // tg.sendData(String(coins));
+        localStorage.setItem('clicker_power', power);
+        localStorage.setItem('clicker_auto', autoClickEnabled);
+
+        // Отправляем прогресс боту (чтобы он мог хранить его надёжно)
+        tg.sendData(JSON.stringify({ coins, power, autoClickEnabled }));
       }
 
       function updateUI() {
         scoreEl.textContent = coins;
         coinsEl.textContent = coins;
+
+        buyAuto.disabled = coins < 100 || autoClickEnabled;
+        buyPower.disabled = coins < 50;
+
+        if (autoClickEnabled) {
+          buyAuto.textContent = 'Автокликер: ВКЛ';
+          buyAuto.style.background = '#4caf50';
+        } else if (coins >= 100) {
+          buyAuto.textContent = 'Купить автокликер (100)';
+        }
+
+        if (power > 1) {
+          buyPower.textContent = `Сила клика: ${power} (следующее: 50)`;
+        } else {
+          buyPower.textContent = 'Сила клика +1 (50)';
+        }
       }
 
       updateUI();
 
       btn.addEventListener('click', () => {
-        coins++;
+        coins += power;
         updateUI();
         save();
       });
+
+      buyAuto.addEventListener('click', () => {
+        if (!autoClickEnabled && coins >= 100) {
+          coins -= 100;
+          autoClickEnabled = true;
+          startAutoClick();
+          updateUI();
+          save();
+        }
+      });
+
+      buyPower.addEventListener('click', () => {
+        if (coins >= 50) {
+          coins -= 50;
+          power++;
+          updateUI();
+          save();
+        }
+      });
+
+      function startAutoClick() {
+        clearInterval(autoInterval);
+        autoInterval = setInterval(() => {
+          if (autoClickEnabled) {
+            coins += power; // автоклик тоже учитывает силу клика
+            updateUI();
+            save();
+          }
+        }, 1000); // раз в секунду
+      }
+
+      // Если автоклик уже был включён при загрузке — запускаем
+      if (autoClickEnabled) {
+        startAutoClick();
+      }
     </script>
   </body>
 </html>
